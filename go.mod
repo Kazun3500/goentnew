@@ -1,6 +1,6 @@
 module goentnew
 
-go 1.21.0
+go 1.20
 
 require (
 	entgo.io/ent v0.12.3
