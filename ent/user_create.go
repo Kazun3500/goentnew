@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"goentnew/ent/service"
 	"goentnew/ent/user"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -37,6 +38,35 @@ func (uc *UserCreate) SetNillableName(s *string) *UserCreate {
 		uc.SetName(*s)
 	}
 	return uc
+}
+
+// SetStatus sets the "status" field.
+func (uc *UserCreate) SetStatus(u user.Status) *UserCreate {
+	uc.mutation.SetStatus(u)
+	return uc
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (uc *UserCreate) SetNillableStatus(u *user.Status) *UserCreate {
+	if u != nil {
+		uc.SetStatus(*u)
+	}
+	return uc
+}
+
+// AddServiceIDs adds the "services" edge to the Service entity by IDs.
+func (uc *UserCreate) AddServiceIDs(ids ...int) *UserCreate {
+	uc.mutation.AddServiceIDs(ids...)
+	return uc
+}
+
+// AddServices adds the "services" edges to the Service entity.
+func (uc *UserCreate) AddServices(s ...*Service) *UserCreate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uc.AddServiceIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -78,6 +108,10 @@ func (uc *UserCreate) defaults() {
 		v := user.DefaultName
 		uc.mutation.SetName(v)
 	}
+	if _, ok := uc.mutation.Status(); !ok {
+		v := user.DefaultStatus
+		uc.mutation.SetStatus(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -92,6 +126,14 @@ func (uc *UserCreate) check() error {
 	}
 	if _, ok := uc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "User.name"`)}
+	}
+	if _, ok := uc.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "User.status"`)}
+	}
+	if v, ok := uc.mutation.Status(); ok {
+		if err := user.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "User.status": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -126,6 +168,26 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Name(); ok {
 		_spec.SetField(user.FieldName, field.TypeString, value)
 		_node.Name = value
+	}
+	if value, ok := uc.mutation.Status(); ok {
+		_spec.SetField(user.FieldStatus, field.TypeEnum, value)
+		_node.Status = value
+	}
+	if nodes := uc.mutation.ServicesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ServicesTable,
+			Columns: []string{user.ServicesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(service.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

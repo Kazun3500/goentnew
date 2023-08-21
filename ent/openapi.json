@@ -6,6 +6,318 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/services": {
+      "get": {
+        "tags": [
+          "Service"
+        ],
+        "summary": "List Services",
+        "description": "List Services.",
+        "operationId": "listService",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "what page to render",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "itemsPerPage",
+            "in": "query",
+            "description": "item count to render per page",
+            "schema": {
+              "type": "integer",
+              "maximum": 255,
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "result Service list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceList"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Service"
+        ],
+        "summary": "Create a new Service",
+        "description": "Creates a new Service and persists it to storage.",
+        "operationId": "createService",
+        "requestBody": {
+          "description": "Service to create",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "взх",
+                      "ЭПЛ"
+                    ]
+                  },
+                  "owner": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "name",
+                  "type"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Service created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceCreate"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/services/{id}": {
+      "get": {
+        "tags": [
+          "Service"
+        ],
+        "summary": "Find a Service by ID",
+        "description": "Finds the Service with the requested ID and returns it.",
+        "operationId": "readService",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the Service",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Service with requested ID was found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceRead"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Service"
+        ],
+        "summary": "Deletes a Service by ID",
+        "description": "Deletes the Service with the requested ID.",
+        "operationId": "deleteService",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the Service",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Service with requested ID was deleted"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Service"
+        ],
+        "summary": "Updates a Service",
+        "description": "Updates a Service and persists changes to storage.",
+        "operationId": "updateService",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the Service",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Service properties to update",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "взх",
+                      "ЭПЛ"
+                    ]
+                  },
+                  "owner": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Service updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceUpdate"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/services/{id}/owner": {
+      "get": {
+        "tags": [
+          "Service"
+        ],
+        "summary": "Find the attached User",
+        "description": "Find the attached User of the Service with the given ID",
+        "operationId": "readServiceOwner",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the Service",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User attached to Service with requested ID was found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Service_OwnerRead"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
     "/users": {
       "get": {
         "tags": [
@@ -82,11 +394,26 @@
                   },
                   "name": {
                     "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "ACTIVE",
+                      "INACTIVE"
+                    ],
+                    "default": "ACTIVE"
+                  },
+                  "services": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
                   }
                 },
                 "required": [
                   "age",
-                  "name"
+                  "name",
+                  "status"
                 ]
               }
             }
@@ -226,6 +553,20 @@
                   },
                   "name": {
                     "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "ACTIVE",
+                      "INACTIVE"
+                    ],
+                    "default": "ACTIVE"
+                  },
+                  "services": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
                   }
                 }
               }
@@ -258,10 +599,220 @@
           }
         }
       }
+    },
+    "/users/{id}/services": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "List attached Services",
+        "description": "List attached Services.",
+        "operationId": "listUserServices",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the User",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "what page to render",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "itemsPerPage",
+            "in": "query",
+            "description": "item count to render per page",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "result Users list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User_ServicesList"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "Service": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "взх",
+              "ЭПЛ"
+            ]
+          },
+          "owner": {
+            "$ref": "#/components/schemas/User"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "type"
+        ]
+      },
+      "ServiceCreate": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "взх",
+              "ЭПЛ"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "type"
+        ]
+      },
+      "ServiceList": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "взх",
+              "ЭПЛ"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "type"
+        ]
+      },
+      "ServiceRead": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "взх",
+              "ЭПЛ"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "type"
+        ]
+      },
+      "ServiceUpdate": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "взх",
+              "ЭПЛ"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "type"
+        ]
+      },
+      "Service_OwnerRead": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "age": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ],
+            "default": "ACTIVE"
+          }
+        },
+        "required": [
+          "id",
+          "age",
+          "name",
+          "status"
+        ]
+      },
       "User": {
         "type": "object",
         "properties": {
@@ -273,12 +824,27 @@
           },
           "name": {
             "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ],
+            "default": "ACTIVE"
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Service"
+            }
           }
         },
         "required": [
           "id",
           "age",
-          "name"
+          "name",
+          "status"
         ]
       },
       "UserCreate": {
@@ -292,12 +858,21 @@
           },
           "name": {
             "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ],
+            "default": "ACTIVE"
           }
         },
         "required": [
           "id",
           "age",
-          "name"
+          "name",
+          "status"
         ]
       },
       "UserList": {
@@ -311,12 +886,21 @@
           },
           "name": {
             "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ],
+            "default": "ACTIVE"
           }
         },
         "required": [
           "id",
           "age",
-          "name"
+          "name",
+          "status"
         ]
       },
       "UserRead": {
@@ -330,12 +914,21 @@
           },
           "name": {
             "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ],
+            "default": "ACTIVE"
           }
         },
         "required": [
           "id",
           "age",
-          "name"
+          "name",
+          "status"
         ]
       },
       "UserUpdate": {
@@ -349,12 +942,44 @@
           },
           "name": {
             "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ],
+            "default": "ACTIVE"
           }
         },
         "required": [
           "id",
           "age",
-          "name"
+          "name",
+          "status"
+        ]
+      },
+      "User_ServicesList": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "взх",
+              "ЭПЛ"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "type"
         ]
       }
     },

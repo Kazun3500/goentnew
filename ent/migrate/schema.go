@@ -8,11 +8,33 @@ import (
 )
 
 var (
+	// ServicesColumns holds the columns for the "services" table.
+	ServicesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"взх", "ЭПЛ"}},
+		{Name: "user_services", Type: field.TypeInt, Nullable: true},
+	}
+	// ServicesTable holds the schema information for the "services" table.
+	ServicesTable = &schema.Table{
+		Name:       "services",
+		Columns:    ServicesColumns,
+		PrimaryKey: []*schema.Column{ServicesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "services_users_services",
+				Columns:    []*schema.Column{ServicesColumns[3]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "age", Type: field.TypeInt},
 		{Name: "name", Type: field.TypeString, Default: "unknown"},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"ACTIVE", "INACTIVE"}, Default: "ACTIVE"},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{
@@ -22,9 +44,11 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		ServicesTable,
 		UsersTable,
 	}
 )
 
 func init() {
+	ServicesTable.ForeignKeys[0].RefTable = UsersTable
 }

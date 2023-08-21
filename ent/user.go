@@ -19,8 +19,31 @@ type User struct {
 	// Age holds the value of the "age" field.
 	Age int `json:"age,omitempty"`
 	// Name holds the value of the "name" field.
-	Name         string `json:"name,omitempty"`
+	Name string `json:"name,omitempty"`
+	// Status holds the value of the "status" field.
+	Status user.Status `json:"status,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the UserQuery when eager-loading is set.
+	Edges        UserEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// UserEdges holds the relations/edges for other nodes in the graph.
+type UserEdges struct {
+	// Services holds the value of the services edge.
+	Services []*Service `json:"services,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// ServicesOrErr returns the Services value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) ServicesOrErr() ([]*Service, error) {
+	if e.loadedTypes[0] {
+		return e.Services, nil
+	}
+	return nil, &NotLoadedError{edge: "services"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -30,7 +53,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case user.FieldID, user.FieldAge:
 			values[i] = new(sql.NullInt64)
-		case user.FieldName:
+		case user.FieldName, user.FieldStatus:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -65,6 +88,12 @@ func (u *User) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				u.Name = value.String
 			}
+		case user.FieldStatus:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
+			} else if value.Valid {
+				u.Status = user.Status(value.String)
+			}
 		default:
 			u.selectValues.Set(columns[i], values[i])
 		}
@@ -76,6 +105,11 @@ func (u *User) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (u *User) Value(name string) (ent.Value, error) {
 	return u.selectValues.Get(name)
+}
+
+// QueryServices queries the "services" edge of the User entity.
+func (u *User) QueryServices() *ServiceQuery {
+	return NewUserClient(u.config).QueryServices(u)
 }
 
 // Update returns a builder for updating this User.
@@ -106,6 +140,9 @@ func (u *User) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(u.Name)
+	builder.WriteString(", ")
+	builder.WriteString("status=")
+	builder.WriteString(fmt.Sprintf("%v", u.Status))
 	builder.WriteByte(')')
 	return builder.String()
 }

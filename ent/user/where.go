@@ -6,6 +6,7 @@ import (
 	"goentnew/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // ID filters vertices based on their ID field.
@@ -166,6 +167,49 @@ func NameEqualFold(v string) predicate.User {
 // NameContainsFold applies the ContainsFold predicate on the "name" field.
 func NameContainsFold(v string) predicate.User {
 	return predicate.User(sql.FieldContainsFold(FieldName, v))
+}
+
+// StatusEQ applies the EQ predicate on the "status" field.
+func StatusEQ(v Status) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldStatus, v))
+}
+
+// StatusNEQ applies the NEQ predicate on the "status" field.
+func StatusNEQ(v Status) predicate.User {
+	return predicate.User(sql.FieldNEQ(FieldStatus, v))
+}
+
+// StatusIn applies the In predicate on the "status" field.
+func StatusIn(vs ...Status) predicate.User {
+	return predicate.User(sql.FieldIn(FieldStatus, vs...))
+}
+
+// StatusNotIn applies the NotIn predicate on the "status" field.
+func StatusNotIn(vs ...Status) predicate.User {
+	return predicate.User(sql.FieldNotIn(FieldStatus, vs...))
+}
+
+// HasServices applies the HasEdge predicate on the "services" edge.
+func HasServices() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ServicesTable, ServicesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasServicesWith applies the HasEdge predicate on the "services" edge with a given conditions (other predicates).
+func HasServicesWith(preds ...predicate.Service) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newServicesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.
