@@ -6,7 +6,7 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// User holds the schema definition for the User entity.
+// Service holds the schema definition for the Service entity.
 type Service struct {
 	ent.Schema
 }
@@ -14,13 +14,14 @@ type Service struct {
 func (Service) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name"),
+		field.Int("owner_id"),
 		field.Enum("type").NamedValues("svh", "взх", "mail_lite", "ЭПЛ"),
 	}
 }
 
 func (Service) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("owner", User.Type).Unique().
-			Ref("services"),
+		edge.From("owner", User.Type).Required().Unique().
+			Ref("services").Field("owner_id"),
 	}
 }

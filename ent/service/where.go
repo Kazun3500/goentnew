@@ -59,6 +59,11 @@ func Name(v string) predicate.Service {
 	return predicate.Service(sql.FieldEQ(FieldName, v))
 }
 
+// OwnerID applies equality check predicate on the "owner_id" field. It's identical to OwnerIDEQ.
+func OwnerID(v int) predicate.Service {
+	return predicate.Service(sql.FieldEQ(FieldOwnerID, v))
+}
+
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Service {
 	return predicate.Service(sql.FieldEQ(FieldName, v))
@@ -122,6 +127,26 @@ func NameEqualFold(v string) predicate.Service {
 // NameContainsFold applies the ContainsFold predicate on the "name" field.
 func NameContainsFold(v string) predicate.Service {
 	return predicate.Service(sql.FieldContainsFold(FieldName, v))
+}
+
+// OwnerIDEQ applies the EQ predicate on the "owner_id" field.
+func OwnerIDEQ(v int) predicate.Service {
+	return predicate.Service(sql.FieldEQ(FieldOwnerID, v))
+}
+
+// OwnerIDNEQ applies the NEQ predicate on the "owner_id" field.
+func OwnerIDNEQ(v int) predicate.Service {
+	return predicate.Service(sql.FieldNEQ(FieldOwnerID, v))
+}
+
+// OwnerIDIn applies the In predicate on the "owner_id" field.
+func OwnerIDIn(vs ...int) predicate.Service {
+	return predicate.Service(sql.FieldIn(FieldOwnerID, vs...))
+}
+
+// OwnerIDNotIn applies the NotIn predicate on the "owner_id" field.
+func OwnerIDNotIn(vs ...int) predicate.Service {
+	return predicate.Service(sql.FieldNotIn(FieldOwnerID, vs...))
 }
 
 // TypeEQ applies the EQ predicate on the "type" field.

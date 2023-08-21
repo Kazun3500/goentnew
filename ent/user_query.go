@@ -412,7 +412,9 @@ func (uq *UserQuery) loadServices(ctx context.Context, query *ServiceQuery, node
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(service.FieldOwnerID)
+	}
 	query.Where(predicate.Service(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(user.ServicesColumn), fks...))
 	}))
@@ -421,13 +423,10 @@ func (uq *UserQuery) loadServices(ctx context.Context, query *ServiceQuery, node
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.user_services
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "user_services" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		fk := n.OwnerID
+		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "user_services" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "owner_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

@@ -13,7 +13,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "type", Type: field.TypeEnum, Enums: []string{"взх", "ЭПЛ"}},
-		{Name: "user_services", Type: field.TypeInt, Nullable: true},
+		{Name: "owner_id", Type: field.TypeInt},
 	}
 	// ServicesTable holds the schema information for the "services" table.
 	ServicesTable = &schema.Table{
@@ -25,7 +25,7 @@ var (
 				Symbol:     "services_users_services",
 				Columns:    []*schema.Column{ServicesColumns[3]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}

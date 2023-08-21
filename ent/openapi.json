@@ -80,6 +80,9 @@
                   "name": {
                     "type": "string"
                   },
+                  "owner_id": {
+                    "type": "integer"
+                  },
                   "type": {
                     "type": "string",
                     "enum": [
@@ -93,7 +96,9 @@
                 },
                 "required": [
                   "name",
-                  "type"
+                  "owner_id",
+                  "type",
+                  "owner"
                 ]
               }
             }
@@ -230,6 +235,9 @@
                 "properties": {
                   "name": {
                     "type": "string"
+                  },
+                  "owner_id": {
+                    "type": "integer"
                   },
                   "type": {
                     "type": "string",
@@ -676,6 +684,9 @@
           "name": {
             "type": "string"
           },
+          "owner_id": {
+            "type": "integer"
+          },
           "type": {
             "type": "string",
             "enum": [
@@ -690,7 +701,9 @@
         "required": [
           "id",
           "name",
-          "type"
+          "owner_id",
+          "type",
+          "owner"
         ]
       },
       "ServiceCreate": {
@@ -701,6 +714,9 @@
           },
           "name": {
             "type": "string"
+          },
+          "owner_id": {
+            "type": "integer"
           },
           "type": {
             "type": "string",
@@ -713,6 +729,7 @@
         "required": [
           "id",
           "name",
+          "owner_id",
           "type"
         ]
       },
@@ -725,6 +742,9 @@
           "name": {
             "type": "string"
           },
+          "owner_id": {
+            "type": "integer"
+          },
           "type": {
             "type": "string",
             "enum": [
@@ -736,6 +756,7 @@
         "required": [
           "id",
           "name",
+          "owner_id",
           "type"
         ]
       },
@@ -748,6 +769,9 @@
           "name": {
             "type": "string"
           },
+          "owner_id": {
+            "type": "integer"
+          },
           "type": {
             "type": "string",
             "enum": [
@@ -759,6 +783,7 @@
         "required": [
           "id",
           "name",
+          "owner_id",
           "type"
         ]
       },
@@ -771,6 +796,9 @@
           "name": {
             "type": "string"
           },
+          "owner_id": {
+            "type": "integer"
+          },
           "type": {
             "type": "string",
             "enum": [
@@ -782,6 +810,7 @@
         "required": [
           "id",
           "name",
+          "owner_id",
           "type"
         ]
       },
@@ -968,6 +997,9 @@
           "name": {
             "type": "string"
           },
+          "owner_id": {
+            "type": "integer"
+          },
           "type": {
             "type": "string",
             "enum": [
@@ -979,6 +1011,7 @@
         "required": [
           "id",
           "name",
+          "owner_id",
           "type"
         ]
       }

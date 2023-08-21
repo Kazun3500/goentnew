@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/loopfz/gadgeto/tonic"
 	"goentnew/ent"
+	"goentnew/ent/user"
 	"net/http"
 
 	swaggerfiles "github.com/swaggo/files"
@@ -20,7 +21,7 @@ import (
 )
 
 func getDb() (*ent.Client, error) {
-	client, err := ent.Open("postgres", "host=127.0.0.1 port=5434 user=postgres dbname=postgres password=mysecretpassword sslmode=disable")
+	client, err := ent.Open("postgres", "host=127.0.0.1 port=5432 user=postgres dbname=postgres password=mysecretpassword sslmode=disable")
 	if err != nil {
 		return nil, fmt.Errorf("failed opening connection to sqlite: %v", err)
 	}
@@ -195,7 +196,13 @@ func main() {
 		panic(err)
 	}
 	defer db.Close()
+	s, err := db.Service.Query().WithOwner(func(query *ent.UserQuery) {
+		query.Select(user.FieldID, user.FieldAge, user.FieldName)
+	}).All(context.Background())
+	fmt.Println(s[0].Edges.Owner)
 
-	fmt.Println(db.User.Query().FirstX(context.Background()))
+	//db.Service.Create().SetName("123").SetType(service.TypeSvh).SetOwner(u).Exec(context.Background())
+
+	//fmt.Println(db.Service.Query().All(context.Background()))
 
 }

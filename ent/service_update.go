@@ -34,23 +34,15 @@ func (su *ServiceUpdate) SetName(s string) *ServiceUpdate {
 	return su
 }
 
+// SetOwnerID sets the "owner_id" field.
+func (su *ServiceUpdate) SetOwnerID(i int) *ServiceUpdate {
+	su.mutation.SetOwnerID(i)
+	return su
+}
+
 // SetType sets the "type" field.
 func (su *ServiceUpdate) SetType(s service.Type) *ServiceUpdate {
 	su.mutation.SetType(s)
-	return su
-}
-
-// SetOwnerID sets the "owner" edge to the User entity by ID.
-func (su *ServiceUpdate) SetOwnerID(id int) *ServiceUpdate {
-	su.mutation.SetOwnerID(id)
-	return su
-}
-
-// SetNillableOwnerID sets the "owner" edge to the User entity by ID if the given value is not nil.
-func (su *ServiceUpdate) SetNillableOwnerID(id *int) *ServiceUpdate {
-	if id != nil {
-		su = su.SetOwnerID(*id)
-	}
 	return su
 }
 
@@ -103,6 +95,9 @@ func (su *ServiceUpdate) check() error {
 		if err := service.TypeValidator(v); err != nil {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Service.type": %w`, err)}
 		}
+	}
+	if _, ok := su.mutation.OwnerID(); su.mutation.OwnerCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Service.owner"`)
 	}
 	return nil
 }
@@ -180,23 +175,15 @@ func (suo *ServiceUpdateOne) SetName(s string) *ServiceUpdateOne {
 	return suo
 }
 
+// SetOwnerID sets the "owner_id" field.
+func (suo *ServiceUpdateOne) SetOwnerID(i int) *ServiceUpdateOne {
+	suo.mutation.SetOwnerID(i)
+	return suo
+}
+
 // SetType sets the "type" field.
 func (suo *ServiceUpdateOne) SetType(s service.Type) *ServiceUpdateOne {
 	suo.mutation.SetType(s)
-	return suo
-}
-
-// SetOwnerID sets the "owner" edge to the User entity by ID.
-func (suo *ServiceUpdateOne) SetOwnerID(id int) *ServiceUpdateOne {
-	suo.mutation.SetOwnerID(id)
-	return suo
-}
-
-// SetNillableOwnerID sets the "owner" edge to the User entity by ID if the given value is not nil.
-func (suo *ServiceUpdateOne) SetNillableOwnerID(id *int) *ServiceUpdateOne {
-	if id != nil {
-		suo = suo.SetOwnerID(*id)
-	}
 	return suo
 }
 
@@ -262,6 +249,9 @@ func (suo *ServiceUpdateOne) check() error {
 		if err := service.TypeValidator(v); err != nil {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Service.type": %w`, err)}
 		}
+	}
+	if _, ok := suo.mutation.OwnerID(); suo.mutation.OwnerCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Service.owner"`)
 	}
 	return nil
 }

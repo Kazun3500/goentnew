@@ -26,23 +26,15 @@ func (sc *ServiceCreate) SetName(s string) *ServiceCreate {
 	return sc
 }
 
+// SetOwnerID sets the "owner_id" field.
+func (sc *ServiceCreate) SetOwnerID(i int) *ServiceCreate {
+	sc.mutation.SetOwnerID(i)
+	return sc
+}
+
 // SetType sets the "type" field.
 func (sc *ServiceCreate) SetType(s service.Type) *ServiceCreate {
 	sc.mutation.SetType(s)
-	return sc
-}
-
-// SetOwnerID sets the "owner" edge to the User entity by ID.
-func (sc *ServiceCreate) SetOwnerID(id int) *ServiceCreate {
-	sc.mutation.SetOwnerID(id)
-	return sc
-}
-
-// SetNillableOwnerID sets the "owner" edge to the User entity by ID if the given value is not nil.
-func (sc *ServiceCreate) SetNillableOwnerID(id *int) *ServiceCreate {
-	if id != nil {
-		sc = sc.SetOwnerID(*id)
-	}
 	return sc
 }
 
@@ -88,6 +80,9 @@ func (sc *ServiceCreate) check() error {
 	if _, ok := sc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Service.name"`)}
 	}
+	if _, ok := sc.mutation.OwnerID(); !ok {
+		return &ValidationError{Name: "owner_id", err: errors.New(`ent: missing required field "Service.owner_id"`)}
+	}
 	if _, ok := sc.mutation.GetType(); !ok {
 		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "Service.type"`)}
 	}
@@ -95,6 +90,9 @@ func (sc *ServiceCreate) check() error {
 		if err := service.TypeValidator(v); err != nil {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Service.type": %w`, err)}
 		}
+	}
+	if _, ok := sc.mutation.OwnerID(); !ok {
+		return &ValidationError{Name: "owner", err: errors.New(`ent: missing required edge "Service.owner"`)}
 	}
 	return nil
 }
@@ -144,7 +142,7 @@ func (sc *ServiceCreate) createSpec() (*Service, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.user_services = &nodes[0]
+		_node.OwnerID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

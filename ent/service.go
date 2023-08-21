@@ -19,13 +19,14 @@ type Service struct {
 	ID int `json:"id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
+	// OwnerID holds the value of the "owner_id" field.
+	OwnerID int `json:"owner_id,omitempty"`
 	// Type holds the value of the "type" field.
 	Type service.Type `json:"type,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ServiceQuery when eager-loading is set.
-	Edges         ServiceEdges `json:"edges"`
-	user_services *int
-	selectValues  sql.SelectValues
+	Edges        ServiceEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // ServiceEdges holds the relations/edges for other nodes in the graph.
@@ -55,12 +56,10 @@ func (*Service) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case service.FieldID:
+		case service.FieldID, service.FieldOwnerID:
 			values[i] = new(sql.NullInt64)
 		case service.FieldName, service.FieldType:
 			values[i] = new(sql.NullString)
-		case service.ForeignKeys[0]: // user_services
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -88,18 +87,17 @@ func (s *Service) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.Name = value.String
 			}
+		case service.FieldOwnerID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field owner_id", values[i])
+			} else if value.Valid {
+				s.OwnerID = int(value.Int64)
+			}
 		case service.FieldType:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field type", values[i])
 			} else if value.Valid {
 				s.Type = service.Type(value.String)
-			}
-		case service.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field user_services", value)
-			} else if value.Valid {
-				s.user_services = new(int)
-				*s.user_services = int(value.Int64)
 			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
@@ -144,6 +142,9 @@ func (s *Service) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", s.ID))
 	builder.WriteString("name=")
 	builder.WriteString(s.Name)
+	builder.WriteString(", ")
+	builder.WriteString("owner_id=")
+	builder.WriteString(fmt.Sprintf("%v", s.OwnerID))
 	builder.WriteString(", ")
 	builder.WriteString("type=")
 	builder.WriteString(fmt.Sprintf("%v", s.Type))

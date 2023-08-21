@@ -23,7 +23,6 @@ type ServiceQuery struct {
 	inters     []Interceptor
 	predicates []predicate.Service
 	withOwner  *UserQuery
-	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -189,7 +188,6 @@ func (sq *ServiceQuery) All(ctx context.Context) ([]*Service, error) {
 		return nil, err
 	}
 	qr := querierAll[[]*Service, *ServiceQuery]()
-	fmt.Println(qr)
 	return withInterceptors[[]*Service](ctx, sq, qr, sq.inters)
 }
 
@@ -370,18 +368,11 @@ func (sq *ServiceQuery) prepareQuery(ctx context.Context) error {
 func (sq *ServiceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Service, error) {
 	var (
 		nodes       = []*Service{}
-		withFKs     = sq.withFKs
 		_spec       = sq.querySpec()
 		loadedTypes = [1]bool{
 			sq.withOwner != nil,
 		}
 	)
-	if sq.withOwner != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, service.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Service).scanValues(nil, columns)
 	}
@@ -413,10 +404,7 @@ func (sq *ServiceQuery) loadOwner(ctx context.Context, query *UserQuery, nodes [
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Service)
 	for i := range nodes {
-		if nodes[i].user_services == nil {
-			continue
-		}
-		fk := *nodes[i].user_services
+		fk := nodes[i].OwnerID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -433,7 +421,7 @@ func (sq *ServiceQuery) loadOwner(ctx context.Context, query *UserQuery, nodes [
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "user_services" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "owner_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -466,6 +454,9 @@ func (sq *ServiceQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != service.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if sq.withOwner != nil {
+			_spec.Node.AddColumnOnce(service.FieldOwnerID)
 		}
 	}
 	if ps := sq.predicates; len(ps) > 0 {

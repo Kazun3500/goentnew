@@ -30,7 +30,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "service" package.
 	ServicesInverseTable = "services"
 	// ServicesColumn is the table column denoting the services relation/edge.
-	ServicesColumn = "user_services"
+	ServicesColumn = "owner_id"
 )
 
 // Columns holds all SQL columns for user fields.
