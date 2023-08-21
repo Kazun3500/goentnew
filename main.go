@@ -188,7 +188,14 @@ func runFizzServer() {
 
 func main() {
 
-	runFizzServer()
+	//runFizzServer()
 	//runServer()
+	db, err := getDb()
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	fmt.Println(db.User.Query().FirstX(context.Background()))
 
 }
